@@ -16,7 +16,10 @@ class Product:
         TODO Верните True если количество продукта больше или равно запрашиваемому
             и False в обратном случае
         """
-        return self.quantity >= quantity
+        if self.quantity >= quantity:
+            return True
+        else:
+            return False
 
     def buy(self, quantity: int):
         """
@@ -50,10 +53,12 @@ class Cart:
         Метод добавления продукта в корзину.
         Если продукт уже есть в корзине, то увеличиваем количество
         """
-        if product.check_quantity(buy_count):
-            self.products[product] = self.products.get(product, 0) + buy_count
-        else:
+        if buy_count > product.quantity:
             raise ValueError(f"Недостаточно товара '{product.name}' на складе для добавления в корзину.")
+        if product in self.products:
+            self.products[product] += buy_count
+        else:
+            self.products[product] = buy_count
 
     def remove_product(self, product: Product, remove_count=None):
         """
@@ -81,5 +86,9 @@ class Cart:
         В этом случае нужно выбросить исключение ValueError
         """
         for product, quantity in self.products.items():
-            product.buy(quantity)
-        self.clear()
+            if quantity > product.quantity:
+                raise ValueError(f"Недостаточно товара '{product.name}' на складе для завершения покупки.")
+        for product, quantity in self.products.items():
+            product.quantity -= quantity
+
+        self.products.clear()
